@@ -315,49 +315,6 @@
     
     .modal-buttons button { flex: 1; padding: 10px; }
     
-    /* ===== نوار پیشرفت ===== */
-    .progress-container {
-      margin-bottom: 12px;
-      background: #fff;
-      border-radius: 12px;
-      padding: 12px;
-      box-shadow: 0 6px 14px rgba(8, 34, 63, 0.06);
-    }
-    
-    .progress-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-    }
-    
-    .progress-title {
-      font-weight: 800;
-      color: var(--primary-dark);
-      font-size: 16px;
-    }
-    
-    .progress-percent {
-      font-weight: 800;
-      color: var(--primary);
-      font-size: 16px;
-    }
-    
-    .progress-bar {
-      height: 12px;
-      background: #eef3fb;
-      border-radius: 6px;
-      overflow: hidden;
-    }
-    
-    .progress-fill {
-      height: 100%;
-      background: linear-gradient(90deg, var(--primary), var(--accent));
-      border-radius: 6px;
-      transition: width 0.3s ease;
-      width: 0%;
-    }
-    
     /* ===== رسپانسیو ===== */
     @media (max-width: 420px) {
       .idler-app .card { padding: 12px; max-width: 420px; }
@@ -379,9 +336,6 @@
       .temp-input { padding: 8px; font-size: 14px; }
       .temp-section { flex-direction: column; gap: 6px; }
       .temp-section label { align-self: flex-start; }
-      
-      .progress-container { padding: 10px; }
-      .progress-title, .progress-percent { font-size: 14px; }
     }
     
     @media (min-height: 700px) {
@@ -412,17 +366,6 @@
 
     <!-- صفحه دوم -->
     <div id="page2" style="display:none">
-      <!-- نوار پیشرفت -->
-      <div class="progress-container" id="progressContainer" style="display:none">
-        <div class="progress-header">
-          <div class="progress-title">پیشرفت تکمیل فرم</div>
-          <div class="progress-percent" id="progressPercent">0%</div>
-        </div>
-        <div class="progress-bar">
-          <div class="progress-fill" id="progressFill" style="width: 0%"></div>
-        </div>
-      </div>
-
       <div class="small-header" id="fixedHeader">
         <div class="pill" id="headerEquipment">-</div>
         <div style="flex:1">
@@ -481,10 +424,6 @@
           <div class="type-item">
             <input class="type-input" type="radio" name="idlerType" id="typeVertical" value="آیدلر ورتیکال">
             <label class="type-label" for="typeVertical">آیدلر ورتیکال</label>
-          </div>
-          <div class="type-item">
-            <input class="type-input" type="radio" name="idlerType" id="typeReturnVertical" value="ریترن ورتیکال">
-            <label class="option-label" for="typeReturnVertical">ریترن ورتیکال</label>
           </div>
         </div>
 
@@ -569,13 +508,12 @@
   <script>
     // ===== داده‌های نمونه برنامه اصلی =====
     const operators = {
-      "12026": "افشار رابري حسن", "12077": "خليفهّ مصطفي", "12144": "شيباني تذرجي رضا",
-      "12227": "مرادي پور شهرام", "12536": "بلوردي جواد", "12959": "دره گرائي روح الله",
-      "12963": "نصرت آبادي سجاد", "12997": "صادقي گوغري ابراهيم", "13079": "قرايي احمد",
-      "13104": "نوروزي كورگاهي اميررضا", "13202": "نژادحيدري محمد", "13231": "حافظي قهستاني اميرحسين",
-      "14126": "شاهبداغي ابوالقاسم","12449": "اکبر پرواسی","12449": "اکبر پرواسی","13075": "محمد سعید فضلعلی","13085": "سید محمد پور فریدونی","13228": "امیر محمد حلوایی","13263": "امین حیدری"
+     "12026": "افشار رابري حسن", "12077": "خليفهّ مصطفي", "12144": "شيباني تذرجي رضا", "12227": "مرادي پور شهرام", "12536": "بلوردي جواد", "12959": "رادمهر روح الله", "12963": "نصرت آبادي سجاد", "12997": "صادقي گوغري ابراهيم", "13079": "قرايي احمد", "13104": "نوروزي كورگاهي اميررضا", "13202": "نژادحيدري محمد", "13231": "حافظي قهستاني اميرحسين", "14126": "شاهبداغي ابوالقاسم", "14304": "قنبری مسعود", "13348": "اسماعیلی دانیال", "12964": "هاشمی رضا", "12965": "حافظی مجتبی", "12961": "ستوده امیر حسین", "13072": "مقدمی رامین", "13097": "رحیمی آرمان", "13059": "هاشمی سید محسن", "13209": "امیری امیر محمد", "13236": "چناری امیر حسین", "12563": "نصرالله پور محسن", "12500": "علی مردانی مهدی", "12946": "رمضانی عباسعلی", "12166": "عباسی علیرضا", "13321": "پورشاه آبادی فرهاد", "12691": "رنجبر محمد", "13374": "فیروز آبادی معیین", "12449": "پروراسی اکبر", "12982": "جلالی علیرضا", "12929": "مطهری مصطفی", "13075": "فضلعلی سعید", "13085": "پورفریدونی محمد", "13228": "حلویی امیرمحمد", "13263": "حیدری امین", "12631": "کریمی محمدعلی", "12006": "محبوبی سعید", "12148": "صادقی مسلم", "12688": "غلامرضا جماشی", "13112": "حسن‌زاده مجتبی", "13227": "خواجویی امیرمحمد", "13347": "غیاثی حمیدرضا", "12916": "عباسی رضا", "13013": "افشار مهدی", "12958": "سالاری سخاوت", "13081": "نژادصالحی امیرحسن", "13111": "اسماعیل‌پور محمد", "13219": "نژادکورکی مهدی", "14474": "گلزاری رضا", "12100": "رضوانی مسعود", "12078": "خلفیه پرویز", "12188": "قاسمی محسن", "13346": "شول مصطفی", "13093": "زیدآبادی محمد", "12951": "پورفریدونی جواد", "13349": "زیدآبادی محمد صادق"
+
     };
 
+
+    
     // گروه‌بندی تجهیزات برای موقعیت‌های مختلف
     const equipmentGroups = {
       group1: ["G7-102", "G7-104/1", "G7-104/2", "G7-105", "G7-106", "G7-107", "G7-211", "G7-212", "G7-215"],
@@ -669,9 +607,6 @@
     const restoreNewBtn = document.getElementById('restoreNewBtn');
     const locationStatus = document.getElementById('locationStatus');
     const gpsWarning = document.getElementById('gpsWarning');
-    const progressContainer = document.getElementById('progressContainer');
-    const progressPercent = document.getElementById('progressPercent');
-    const progressFill = document.getElementById('progressFill');
 
     // ===== المان‌های برنامه آیدلر =====
     const mainApp = document.getElementById('mainApp');
@@ -708,111 +643,6 @@
         ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); 
     }
 
-    // ===== توابع محاسبه پیشرفت =====
-    function calculateProgress() {
-      if (!currentEquipment || currentComponents.length === 0) {
-        return { progress: 0, totalItems: 0, completedItems: 0 };
-      }
-
-      let totalItems = 0;
-      let completedItems = 0;
-
-      // محاسبه آیتم‌های معمولی
-      currentComponents.forEach((compName, index) => {
-        if (compName === "ثبت آیدلر" || compName === "ارتعاش‌سنجی") {
-          return; // این موارد به صورت جداگانه محاسبه می‌شوند
-        }
-
-        const items = checklistItems[compName] || [];
-        totalItems += items.length;
-
-        const savedData = allComponentsData[index];
-        if (savedData && savedData.checklist) {
-          savedData.checklist.forEach(item => {
-            if (item.status === 'ok' || item.status === 'notok') {
-              completedItems++;
-            }
-          });
-        }
-      });
-
-      // محاسبه بخش ارتعاش‌سنجی
-      const vibrationIndex = currentComponents.indexOf("ارتعاش‌سنجی");
-      if (vibrationIndex !== -1) {
-        const savedData = allComponentsData[vibrationIndex];
-        if (savedData && savedData.vibrationData) {
-          const vibrationData = savedData.vibrationData;
-          
-          // لیست تمام فیلدهای ارتعاش‌سنجی
-          const vibrationFields = [
-            // موتور - Lose
-            vibrationData.motor?.lose?.horizontal,
-            vibrationData.motor?.lose?.vertical,
-            vibrationData.motor?.lose?.axial,
-            // موتور - Fixe
-            vibrationData.motor?.fixe?.horizontal,
-            vibrationData.motor?.fixe?.vertical,
-            vibrationData.motor?.fixe?.axial,
-            // موتور - دما
-            vibrationData.motor?.temperature,
-            // گیربکس - Lose
-            vibrationData.gearbox?.lose?.horizontal,
-            vibrationData.gearbox?.lose?.vertical,
-            vibrationData.gearbox?.lose?.axial,
-            // گیربکس - Fixe
-            vibrationData.gearbox?.fixe?.horizontal,
-            vibrationData.gearbox?.fixe?.vertical,
-            vibrationData.gearbox?.fixe?.axial,
-            // گیربکس - دما
-            vibrationData.gearbox?.temperature
-          ];
-
-          // شمارش فیلدهای پر شده
-          let vibrationCompleted = 0;
-          vibrationFields.forEach(field => {
-            if (field !== null && field !== undefined && field !== '') {
-              vibrationCompleted++;
-            }
-          });
-
-          // اگر حداقل یک فیلد پر شده باشد، این بخش را در محاسبات لحاظ می‌کنیم
-          if (vibrationCompleted > 0) {
-            totalItems += 14; // 14 فیلد در بخش ارتعاش‌سنجی
-            completedItems += vibrationCompleted;
-          }
-        }
-      }
-
-      // محاسبه بخش ثبت آیدلر
-      const idlerIndex = currentComponents.indexOf("ثبت آیدلر");
-      if (idlerIndex !== -1) {
-        const idlersData = JSON.parse(localStorage.getItem('idlers') || '[]');
-        const currentEquipmentIdlers = idlersData.filter(idler => idler.equipment === currentEquipment);
-        
-        // اگر حداقل یک آیدلر ثبت شده باشد، این بخش را در محاسبات لحاظ می‌کنیم
-        if (currentEquipmentIdlers.length > 0) {
-          totalItems += currentEquipmentIdlers.length;
-          completedItems += currentEquipmentIdlers.length;
-        }
-      }
-
-      const progress = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
-      return { progress, totalItems, completedItems };
-    }
-
-    function updateProgress() {
-      const { progress, totalItems, completedItems } = calculateProgress();
-      progressPercent.textContent = `${progress}%`;
-      progressFill.style.width = `${progress}%`;
-      
-      // نمایش یا پنهان کردن نوار پیشرفت
-      if (progress > 0) {
-        progressContainer.style.display = 'block';
-      } else {
-        progressContainer.style.display = 'none';
-      }
-    }
-
     // ===== توابع بخش ارتعاش‌سنجی =====
     function createVibrationSection() {
       return `
@@ -820,31 +650,16 @@
           <!-- بخش موتور -->
           <div class="vibration-part">
             <div class="part-title">موتور</div>
-            
-            <!-- ردیف Lose -->
             <div class="position-labels">
-              <div class="position-label">Lose افقی</div>
-              <div class="position-label">Lose عمودی</div>
-              <div class="position-label">Lose محوری</div>
+              <div class="position-label">افقی</div>
+              <div class="position-label">عمودی</div>
+              <div class="position-label">محوری</div>
             </div>
             <div class="position-inputs">
-              <input type="number" class="vibration-input" id="motor_lose_horizontal" placeholder="---" step="0.01" min="0">
-              <input type="number" class="vibration-input" id="motor_lose_vertical" placeholder="---" step="0.01" min="0">
-              <input type="number" class="vibration-input" id="motor_lose_axial" placeholder="---" step="0.01" min="0">
+              <input type="number" class="vibration-input" id="motor_horizontal" placeholder="---" step="0.01" min="0">
+              <input type="number" class="vibration-input" id="motor_vertical" placeholder="---" step="0.01" min="0">
+              <input type="number" class="vibration-input" id="motor_axial" placeholder="---" step="0.01" min="0">
             </div>
-            
-            <!-- ردیف Fixe -->
-            <div class="position-labels">
-              <div class="position-label">Fixe افقی</div>
-              <div class="position-label">Fixe عمودی</div>
-              <div class="position-label">Fixe محوری</div>
-            </div>
-            <div class="position-inputs">
-              <input type="number" class="vibration-input" id="motor_fixe_horizontal" placeholder="---" step="0.01" min="0">
-              <input type="number" class="vibration-input" id="motor_fixe_vertical" placeholder="---" step="0.01" min="0">
-              <input type="number" class="vibration-input" id="motor_fixe_axial" placeholder="---" step="0.01" min="0">
-            </div>
-            
             <div class="unit">mm/s</div>
             
             <div class="temp-section">
@@ -857,31 +672,16 @@
           <!-- بخش گیربکس -->
           <div class="vibration-part">
             <div class="part-title">گیربکس</div>
-            
-            <!-- ردیف Lose -->
             <div class="position-labels">
-              <div class="position-label">Lose افقی</div>
-              <div class="position-label">Lose عمودی</div>
-              <div class="position-label">Lose محوری</div>
+              <div class="position-label">افقی</div>
+              <div class="position-label">عمودی</div>
+              <div class="position-label">محوری</div>
             </div>
             <div class="position-inputs">
-              <input type="number" class="vibration-input" id="gearbox_lose_horizontal" placeholder="---" step="0.01" min="0">
-              <input type="number" class="vibration-input" id="gearbox_lose_vertical" placeholder="---" step="0.01" min="0">
-              <input type="number" class="vibration-input" id="gearbox_lose_axial" placeholder="---" step="0.01" min="0">
+              <input type="number" class="vibration-input" id="gearbox_horizontal" placeholder="---" step="0.01" min="0">
+              <input type="number" class="vibration-input" id="gearbox_vertical" placeholder="---" step="0.01" min="0">
+              <input type="number" class="vibration-input" id="gearbox_axial" placeholder="---" step="0.01" min="0">
             </div>
-            
-            <!-- ردیف Fixe -->
-            <div class="position-labels">
-              <div class="position-label">Fixe افقی</div>
-              <div class="position-label">Fixe عمودی</div>
-              <div class="position-label">Fixe محوری</div>
-            </div>
-            <div class="position-inputs">
-              <input type="number" class="vibration-input" id="gearbox_fixe_horizontal" placeholder="---" step="0.01" min="0">
-              <input type="number" class="vibration-input" id="gearbox_fixe_vertical" placeholder="---" step="0.01" min="0">
-              <input type="number" class="vibration-input" id="gearbox_fixe_axial" placeholder="---" step="0.01" min="0">
-            </div>
-            
             <div class="unit">mm/s</div>
             
             <div class="temp-section">
@@ -900,41 +700,19 @@
       if (saved && saved.vibrationData) {
         const data = saved.vibrationData;
         
-        // بارگذاری داده‌های موتور - Lose
-        if (data.motor && data.motor.lose) {
-          document.getElementById('motor_lose_horizontal').value = data.motor.lose.horizontal || '';
-          document.getElementById('motor_lose_vertical').value = data.motor.lose.vertical || '';
-          document.getElementById('motor_lose_axial').value = data.motor.lose.axial || '';
-        }
-        
-        // بارگذاری داده‌های موتور - Fixe
-        if (data.motor && data.motor.fixe) {
-          document.getElementById('motor_fixe_horizontal').value = data.motor.fixe.horizontal || '';
-          document.getElementById('motor_fixe_vertical').value = data.motor.fixe.vertical || '';
-          document.getElementById('motor_fixe_axial').value = data.motor.fixe.axial || '';
-        }
-        
-        // بارگذاری دمای موتور
+        // بارگذاری داده‌های موتور
         if (data.motor) {
+          document.getElementById('motor_horizontal').value = data.motor.horizontal || '';
+          document.getElementById('motor_vertical').value = data.motor.vertical || '';
+          document.getElementById('motor_axial').value = data.motor.axial || '';
           document.getElementById('motor_temp').value = data.motor.temperature || '';
         }
         
-        // بارگذاری داده‌های گیربکس - Lose
-        if (data.gearbox && data.gearbox.lose) {
-          document.getElementById('gearbox_lose_horizontal').value = data.gearbox.lose.horizontal || '';
-          document.getElementById('gearbox_lose_vertical').value = data.gearbox.lose.vertical || '';
-          document.getElementById('gearbox_lose_axial').value = data.gearbox.lose.axial || '';
-        }
-        
-        // بارگذاری داده‌های گیربکس - Fixe
-        if (data.gearbox && data.gearbox.fixe) {
-          document.getElementById('gearbox_fixe_horizontal').value = data.gearbox.fixe.horizontal || '';
-          document.getElementById('gearbox_fixe_vertical').value = data.gearbox.fixe.vertical || '';
-          document.getElementById('gearbox_fixe_axial').value = data.gearbox.fixe.axial || '';
-        }
-        
-        // بارگذاری دمای گیربکس
+        // بارگذاری داده‌های گیربکس
         if (data.gearbox) {
+          document.getElementById('gearbox_horizontal').value = data.gearbox.horizontal || '';
+          document.getElementById('gearbox_vertical').value = data.gearbox.vertical || '';
+          document.getElementById('gearbox_axial').value = data.gearbox.axial || '';
           document.getElementById('gearbox_temp').value = data.gearbox.temperature || '';
         }
       }
@@ -943,29 +721,15 @@
     function saveVibrationData() {
       const vibrationData = {
         motor: {
-          lose: {
-            horizontal: document.getElementById('motor_lose_horizontal').value || null,
-            vertical: document.getElementById('motor_lose_vertical').value || null,
-            axial: document.getElementById('motor_lose_axial').value || null
-          },
-          fixe: {
-            horizontal: document.getElementById('motor_fixe_horizontal').value || null,
-            vertical: document.getElementById('motor_fixe_vertical').value || null,
-            axial: document.getElementById('motor_fixe_axial').value || null
-          },
+          horizontal: document.getElementById('motor_horizontal').value || null,
+          vertical: document.getElementById('motor_vertical').value || null,
+          axial: document.getElementById('motor_axial').value || null,
           temperature: document.getElementById('motor_temp').value || null
         },
         gearbox: {
-          lose: {
-            horizontal: document.getElementById('gearbox_lose_horizontal').value || null,
-            vertical: document.getElementById('gearbox_lose_vertical').value || null,
-            axial: document.getElementById('gearbox_lose_axial').value || null
-          },
-          fixe: {
-            horizontal: document.getElementById('gearbox_fixe_horizontal').value || null,
-            vertical: document.getElementById('gearbox_fixe_vertical').value || null,
-            axial: document.getElementById('gearbox_fixe_axial').value || null
-          },
+          horizontal: document.getElementById('gearbox_horizontal').value || null,
+          vertical: document.getElementById('gearbox_vertical').value || null,
+          axial: document.getElementById('gearbox_axial').value || null,
           temperature: document.getElementById('gearbox_temp').value || null
         },
         unit: "mm/s",
@@ -1033,9 +797,6 @@
         equipment: currentEquipment // ذخیره نام تجهیز
       });
       localStorage.setItem('idlers', JSON.stringify(idlers));
-      
-      // به روز رسانی پیشرفت پس از ثبت آیدلر
-      updateProgress();
     }
 
     function resetIdlerFormKeepTypeFocus() {
@@ -1215,8 +976,6 @@
       // وقتی به برنامه اصلی بازگشتیم، جزء فعلی را دوباره بارگذاری می‌کنیم
       if (currentComponents.length > 0) {
         loadComponent(currentIndex);
-        // به روز رسانی پیشرفت
-        updateProgress();
       }
     }
 
@@ -1297,12 +1056,6 @@
     }
 
     function disableFormActions() {
-      // برای کاربر با شماره پرسنلی 14126، GPS الزامی نیست
-      const pid = toEnglishDigits(elId.value.trim());
-      if (pid === "14126") {
-        return;
-      }
-      
       const activeButtons = [nextBtn, prevBtn, saveBtn, newFormBtn];
       activeButtons.forEach(btn => {
         if (btn) {
@@ -1333,14 +1086,6 @@
     }
 
     function startGeolocationMonitoring() {
-      // برای کاربر با شماره پرسنلی 14126، GPS الزامی نیست
-      const pid = toEnglishDigits(elId.value.trim());
-      if (pid === "14126") {
-        enableFormActions();
-        locationStatus.textContent = "موقعیت‌یابی: برای این کاربر الزامی نیست";
-        return;
-      }
-      
       if (geolocationWatchId) {
         navigator.geolocation.clearWatch(geolocationWatchId);
       }
@@ -1384,14 +1129,6 @@
     }
 
     function getLocation() {
-      // برای کاربر با شماره پرسنلی 14126، GPS الزامی نیست
-      const pid = toEnglishDigits(elId.value.trim());
-      if (pid === "14126") {
-        enableFormActions();
-        locationStatus.textContent = "موقعیت‌یابی: برای این کاربر الزامی نیست";
-        return Promise.resolve(true);
-      }
-      
       return new Promise((resolve) => {
         locationStatus.textContent = "موقعیت‌یابی: در حال دریافت...";
         
@@ -1513,15 +1250,12 @@
         return false; 
       }
       
-      // برای کاربر با شماره پرسنلی 14126، GPS الزامی نیست
-      if (pid !== "14126") {
-        const hasPermission = await checkGeolocationPermission();
-        if (!hasPermission) {
-          alert('برای استفاده از این برنامه، باید دسترسی موقعیت‌یابی (GPS) را فعال کنید.');
-          const locationSuccess = await getLocation();
-          if (!locationSuccess) {
-            return false;
-          }
+      const hasPermission = await checkGeolocationPermission();
+      if (!hasPermission) {
+        alert('برای استفاده از این برنامه، باید دسترسی موقعیت‌یابی (GPS) را فعال کنید.');
+        const locationSuccess = await getLocation();
+        if (!locationSuccess) {
+          return false;
         }
       }
       
@@ -1541,9 +1275,6 @@
       
       startGeolocationMonitoring();
       saveStateToLocalStorage();
-      
-      // به روز رسانی پیشرفت
-      updateProgress();
       
       setTimeout(() => { 
         window.scrollTo({ top: 0, behavior: 'smooth' }); 
@@ -1604,8 +1335,6 @@
           input.addEventListener('input', () => {
             saveCurrentComponentData();
             saveStateToLocalStorage();
-            // به روز رسانی پیشرفت
-            updateProgress();
           });
         });
         
@@ -1666,8 +1395,6 @@
             
             saveCurrentComponentData();
             saveStateToLocalStorage();
-            // به روز رسانی پیشرفت
-            updateProgress();
           }
 
           okLabel.addEventListener('click', () => {
@@ -1742,7 +1469,7 @@
     }
 
     nextBtn.addEventListener('click', () => { 
-      if (!gpsAccessGranted && toEnglishDigits(elId.value.trim()) !== "14126") {
+      if (!gpsAccessGranted) {
         alert('برای ادامه کار، دسترسی به موقعیت‌یابی ضروری است.');
         getLocation();
         return;
@@ -1755,7 +1482,7 @@
     });
 
     prevBtn.addEventListener('click', () => { 
-      if (!gpsAccessGranted && toEnglishDigits(elId.value.trim()) !== "14126") {
+      if (!gpsAccessGranted) {
         alert('برای ادامه کار، دسترسی به موقعیت‌یابی ضروری است.');
         getLocation();
         return;
@@ -1768,7 +1495,7 @@
     });
 
     newFormBtn.addEventListener('click', async () => {
-      if (!gpsAccessGranted && toEnglishDigits(elId.value.trim()) !== "14126") {
+      if (!gpsAccessGranted) {
         alert('برای ذخیره فرم، دسترسی به موقعیت‌یابی ضروری است.');
         getLocation();
         return;
@@ -1798,7 +1525,7 @@
     });
 
     saveBtn.addEventListener('click', async () => {
-      if (!gpsAccessGranted && toEnglishDigits(elId.value.trim()) !== "14126") {
+      if (!gpsAccessGranted) {
         alert('برای ذخیره نهایی، دسترسی به موقعیت‌یابی ضروری است.');
         getLocation();
         return;
@@ -1840,9 +1567,6 @@
       // دریافت داده‌های آیدلر از localStorage
       const idlersData = JSON.parse(localStorage.getItem('idlers') || '[]');
       
-      // محاسبه پیشرفت
-      const { progress, totalItems, completedItems } = calculateProgress();
-      
       const payload = { 
         personnelId: pid, 
         personnelName: pname, 
@@ -1850,12 +1574,7 @@
         savedAt: nowFa(), 
         location: currentLocation,
         components: allComponentsData,
-        idlers: idlersData,  // اضافه کردن داده‌های آیدلر
-        progress: {
-          percent: progress,
-          totalItems: totalItems,
-          completedItems: completedItems
-        }
+        idlers: idlersData  // اضافه کردن داده‌های آیدلر
       };
       
       try {
@@ -1896,9 +1615,6 @@
       page1.style.display = 'none';
       page2.style.display = 'block';
       loadComponent(currentIndex);
-      
-      // به روز رسانی پیشرفت
-      updateProgress();
     }
 
     function startNewForm() {
@@ -1958,12 +1674,8 @@
             enableFormActions();
             startGeolocationMonitoring();
           } else {
-            // برای کاربر با شماره پرسنلی 14126، GPS الزامی نیست
-            const pid = toEnglishDigits(elId.value.trim());
-            if (pid !== "14126") {
-              disableFormActions();
-              locationStatus.textContent = "موقعیت‌یابی: دسترسی لغو شد";
-            }
+            disableFormActions();
+            locationStatus.textContent = "موقعیت‌یابی: دسترسی لغو شد";
           }
         };
       });
