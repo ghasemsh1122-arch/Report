@@ -84,6 +84,11 @@
       background: #ffebee; border-color: #f44336;
     }
     
+    .main-app .ci-opts label.bulk-ok.selected {
+      background: #e1f0e1; border-color: #66bb6a;
+      opacity: 0.8;
+    }
+    
     .main-app input[type="radio"] { display: none; }
     
     .main-app .nav {
@@ -193,7 +198,28 @@
     }
     
     .temp-input::placeholder { color: #999; text-align: center; }
+
+    /* ===== استایل‌های چک‌باکس انتخاب همه OK ===== */
+    .select-all-container {
+      margin-top: 16px; padding: 12px; background: #f8fbff; 
+      border-radius: 10px; border: 2px dashed #e6eefb;
+      text-align: center;
+    }
     
+    .select-all-checkbox {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      cursor: pointer; font-weight: 700; color: #0a5ea4;
+    }
+    
+    .select-all-checkbox input {
+      width: 20px; height: 20px; cursor: pointer;
+    }
+    
+    .select-all-hint {
+      font-size: 12px; color: #5b7288; margin-top: 4px;
+      font-style: italic;
+    }
+
     /* ===== استایل‌های برنامه آیدلر ===== */
     .idler-app {
       display: flex; align-items: center; justify-content: center; 
@@ -315,6 +341,41 @@
     
     .modal-buttons button { flex: 1; padding: 10px; }
     
+    /* ===== استایل‌های درصد پیشرفت ===== */
+    .progress-display {
+      background: #e8f5e9; padding: 8px 12px; border-radius: 8px; 
+      margin-bottom: 12px; border: 1px solid #c8e6c9;
+    }
+    
+    .progress-header {
+      display: flex; justify-content: space-between; align-items: center; 
+      font-weight: 700;
+    }
+    
+    .progress-count {
+      font-size: 12px; color: #2e7d32;
+    }
+    
+    .progress-bar {
+      background: #c8e6c9; height: 6px; border-radius: 3px; 
+      margin-top: 6px; overflow: hidden;
+    }
+    
+    .progress-fill {
+      background: #2e7d32; height: 100%; transition: width 0.3s ease;
+    }
+    
+    /* ===== استایل‌های دکمه وارد کردن فایل ===== */
+    .import-btn {
+      background: #9c27b0; color: #fff; border: none;
+      padding: 12px; font-weight: 800; border-radius: 10px; cursor: pointer;
+      font-size: 15px; margin-top: 8px;
+    }
+    
+    .import-btn:hover {
+      background: #7b1fa2;
+    }
+    
     /* ===== رسپانسیو ===== */
     @media (max-width: 420px) {
       .idler-app .card { padding: 12px; max-width: 420px; }
@@ -378,6 +439,17 @@
         <select id="componentSelectPage2"></select>
       </div>
 
+      <!-- نمایش درصد پیشرفت -->
+      <div id="progressDisplay" class="progress-display" style="display: none;">
+        <div class="progress-header">
+          <span>پیشرفت فرم: <span id="progressPercentage">0</span>%</span>
+          <span class="progress-count"><span id="progressCompleted">0</span> از <span id="progressTotal">0</span></span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+        </div>
+      </div>
+
       <div class="card">
         <h2 id="componentTitle" style="margin-top:.5px;font-size:.5px">---</h2>
 
@@ -395,8 +467,9 @@
           ⚠ دسترسی به موقعیت‌یابی ضروری است. لطفاً GPS دستگاه خود را فعال کنید و مجوز دسترسی را بدهید.
         </div>
         <div style="height:8px"></div>
-        <div style="display:flex;gap:8px">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
           <button id="saveBtn" style="flex:1">📥 ثبت نهایی و ذخیره</button>
+          <button id="importBtn" class="import-btn" style="flex:1">📁 وارد کردن فایل قبلی</button>
           <button id="resetBtn" class="small-ghost" style="flex:1;display:none">پاک کردن فرم</button>
         </div>
         <div class="location-status" id="locationStatus">موقعیت‌یابی: در حال دریافت...</div>
@@ -473,7 +546,7 @@
               <label class="option-label" for="probCup">جام</label>
             </div>
             <div class="group-item">
-              <input class="checkbox-input" type="checkbox" id="probWear" value="سایش زیاد">
+              <input class="checkbox-input" type="checkbox" id="probWear" value="سایش ز  اد">
               <label class="option-label" for="probWear">سایش زیاد</label>
             </div>
           </div>
@@ -505,15 +578,15 @@
     </div>
   </div>
 
+  <!-- input مخفی برای انتخاب فایل -->
+  <input type="file" id="fileInput" accept=".json" style="display:none">
+
   <script>
     // ===== داده‌های نمونه برنامه اصلی =====
     const operators = {
      "12026": "افشار رابري حسن", "12077": "خليفهّ مصطفي", "12144": "شيباني تذرجي رضا", "12227": "مرادي پور شهرام", "12536": "بلوردي جواد", "12959": "رادمهر روح الله", "12963": "نصرت آبادي سجاد", "12997": "صادقي گوغري ابراهيم", "13079": "قرايي احمد", "13104": "نوروزي كورگاهي اميررضا", "13202": "نژادحيدري محمد", "13231": "حافظي قهستاني اميرحسين", "14126": "شاهبداغي ابوالقاسم", "14304": "قنبری مسعود", "13348": "اسماعیلی دانیال", "12964": "هاشمی رضا", "12965": "حافظی مجتبی", "12961": "ستوده امیر حسین", "13072": "مقدمی رامین", "13097": "رحیمی آرمان", "13059": "هاشمی سید محسن", "13209": "امیری امیر محمد", "13236": "چناری امیر حسین", "12563": "نصرالله پور محسن", "12500": "علی مردانی مهدی", "12946": "رمضانی عباسعلی", "12166": "عباسی علیرضا", "13321": "پورشاه آبادی فرهاد", "12691": "رنجبر محمد", "13374": "فیروز آبادی معیین", "12449": "پروراسی اکبر", "12982": "جلالی علیرضا", "12929": "مطهری مصطفی", "13075": "فضلعلی سعید", "13085": "پورفریدونی محمد", "13228": "حلویی امیرمحمد", "13263": "حیدری امین", "12631": "کریمی محمدعلی", "12006": "محبوبی سعید", "12148": "صادقی مسلم", "12688": "غلامرضا جماشی", "13112": "حسن‌زاده مجتبی", "13227": "خواجویی امیرمحمد", "13347": "غیاثی حمیدرضا", "12916": "عباسی رضا", "13013": "افشار مهدی", "12958": "سالاری سخاوت", "13081": "نژادصالحی امیرحسن", "13111": "اسماعیل‌پور محمد", "13219": "نژادکورکی مهدی", "14474": "گلزاری رضا", "12100": "رضوانی مسعود", "12078": "خلفیه پرویز", "12188": "قاسمی محسن", "13346": "شول مصطفی", "13093": "زیدآبادی محمد", "12951": "پورفریدونی جواد", "13349": "زیدآبادی محمد صادق"
-
     };
 
-
-    
     // گروه‌بندی تجهیزات برای موقعیت‌های مختلف
     const equipmentGroups = {
       group1: ["G7-102", "G7-104/1", "G7-104/2", "G7-105", "G7-106", "G7-107", "G7-211", "G7-212", "G7-215"],
@@ -543,16 +616,16 @@
       "G7-105": ["درام تیل:", "شوت ورودی:", "نوار:", "غلطک ها:", "درام بندینگ تیل:", "درام بندینگ هد:", "درام تنشن:", "کانترویت:", "شوت خروجی:","درام اسنپ هد:", "درام هد:", "موتور:", "کوپلینگ موتور:", "گیربکس:", "5S:", "ثبت آیدلر", "ارتعاش‌سنجی"],
       "G7-106": ["درام تیل:", "شوت ورودی:", "نوار:", "غلطک ها:", "درام بندینگ تیل:", "درام بندینگ هد:", "درام تنشن:", "کانترویت:", "شوت خروجی:","درام اسنپ هد:", "درام هد:", "موتور:", "کوپلینگ موتور:", "گیربکس:", "5S:", "ثبت آیدلر", "ارتعاش‌سنجی"],
       "G7-107": ["درام تیل:", "درام اسنپ تیل:", "شوت ورودی:", "نوار:", "غلطک ها:", "درام تخلیه:", "درام بندینگ بالا:", "درام بندینگ تیل:", "درام بندینگ هد:", "درام تنشن:", "کانترویت:", "شوت خروجی:","درام اسنپ هد:", "درام هد:", "موتور:", "کوپلینگ موتور:", "گیربکس:", "5S:", "ثبت آیدلر", "ارتعاش‌سنجی"],
-          "G7-209": ["درام تیل:", "شوت ورودی:", "نوار:", "غلطک ها:", "درام بندینگ تیل:", "درام بندینگ هد:", "درام تنشن:", "کانترویت:", "شوت خروجی:","درام اسنپ هد:", "درام هد:", "موتور:", "کوپلینگ موتور:", "گیربکس:", "5S:", "ثبت آیدلر", "ارتعاش‌سنجی"],
+          "G7-209": ["درام تیل:", "شوت و  ودی:", "نوار:", "غلطک ها:", "درام بندینگ تیل:", "درام بندینگ هد:", "درام تنشن:", "کانترویت:", "شوت خروجی:","درام اسنپ هd:", "درام هد:", "موتور:", "کوپلینگ موتور:", "گیربکس:", "5S:", "ثبت آیدلر", "ارتعاش‌سنجی"],
       "G7-210": ["درام تیل:", "شوت ورودی:", "نوار:", "غلطک ها:", "درام بندینگ تیل:", "درام بندینگ هد:", "درام تنشن:", "کانترویت:", "شوت خروجی:","درام اسنپ هد:", "درام هد:", "موتور:", "کوپلینگ موتور:", "گیربکس:", "5S:", "ثبت آیدلر", "ارتعاش‌سنجی"],
-      "G7-211": ["درام تیل:", "شوت ورودی:", "نوار:", "غلطک ها:", "درام بندینگ تیل:", "درام بندینگ هد:", "درام تنشن:", "کانترویت:", "شوت خروجی:","درام اسنپ هد:", "درام هد:", "موتور:", "کوپلینگ موتور:", "گیربکس:", "5S:", "ثبت آیدلر", "ارتعاش‌سنجی"],
+      "G7-211": ["درام تیل:", "شوت ورودی:", "نوار:", "غلطک ها:", "درام بندینگ تیل:", "درام بندینگ هd:", "درام تنشن:", "کانترویت:", "شوت خروجی:","درام اسنپ هد:", "درام هد:", "موتور:", "کوپلینگ موتور:", "گیربکس:", "5S:", "ثبت آیدلر", "ارتعاش‌سنجی"],
       "G7-212": ["درام تیل:", "شوت ورودی:", "نوار:", "غلطک ها:", "درام بندینگ تیل:", "درام بندینگ هد:", "درام تنشن:", "کانترویت:", "شوت خروجی:","درام اسنپ هد:", "درام هد:", "موتور:", "کوپلینگ موتور:", "گیربکس:", "5S:", "ثبت آیدلر", "ارتعاش‌سنجی"],
-      "G7-213": ["درام تیل:", "شوت ورودی:", "نوار:", "غلطک ها:", "درام بندینگ تیل:", "درام بندینگ هد:", "درام تنشن:", "کانترویت:", "شوت خروجی:","درام اسنپ هد:", "درام هد:", "موتور:", "کوپلینگ موتور:", "گیربکس:", "5S:", "ثبت آیدلر", "ارتعاش‌سنجی"],
+      "G7-213": ["درام تیل:", "شوت ورودی:", "نوار:", "غلطک ها:", "درام بندینگ تیل:", "درام بندینگ هد:", "درام تنشن:", "کانترویت:", "شوت خروجی:","درام اسنپ هد:", "درام هd:", "موتور:", "کوپلینگ موتور:", "گیربکس:", "5S:", "ثبت آیدلر", "ارتعاش‌سنجی"],
       "G7-214": ["درام تیل:", "شوت ورودی:", "نوار:", "غلطک ها:", "درام بندینگ تیل:", "درام بندینگ هد:", "درام تنشن:", "کانترویت:", "شوت خروجی:","درام اسنپ هد:", "درام هد:", "موتور:", "کوپلینگ موتور:", "گیربکس:", "5S:", "ثبت آیدلر", "ارتعاش‌سنجی"],
-      "G7-215": ["درام تیل:", "شوت ورودی:", "نوار:", "غلطک ها:", "درام بندینگ تیل:", "درام بندینگ هد:", "درام تنشن:", "کانترویت:", "شوت خروجی:","درام اسنپ هد:", "درام هد:", "موتور:", "کوپلینگ موتور:", "گیربکس:", "5S:", "ثبت آیدلر", "ارتعاش‌سنجی"],
+      "G7-215": ["درام تیل:", "شوت ورودی:", "نوار:", "غلطک ها:", "درام بندینگ تیل:", "درام بندینگ هد:", "درام تنشن:", "کانترویت:", "شوت خروجی:","درام اسنپ هd:", "درام هد:", "موتور:", "کوپلینگ موتور:", "گیربکس:", "5S:", "ثبت آیدلر", "ارتعاش‌سنجی"],
       "G7-216": ["درام تیل:", "شوت ورودی:", "نوار:", "غلطک ها:", "درام بندینگ تیل:", "درام بندینگ هد:", "درام تنشن:", "کانترویت:", "شوت خروجی:","درام اسنپ هد:", "درام هد:", "موتور:", "کوپلینگ موتور:", "گیربکس:", "5S:", "ثبت آیدلر", "ارتعاش‌سنجی"],
-      "G7-220A": ["درام تیل:", "شوت ورودی:", "نوار:", "غلطک ها:", "درام بندینگ تیل:", "درام بندینگ هد:", "درام تنشن:", "کانترویت:", "شوت خروجی:","درام اسنپ هد:", "درام هد:", "موتور:", "کوپلینگ موتور:", "گیربکس:", "5S:", "ثبت آیدلر", "ارتعاش‌سنجی"],
-      "G7-220B": ["درام تیل:", "شوت ورودی:", "نوار:", "غلطک ها:", "درام بندینگ تیل:", "درام بندینگ هد:", "درام تنشن:", "کانترویت:", "شوت خروجی:","درام اسنپ هد:", "درام هد:", "موتور:", "کوپلینگ موتور:", "گیربکس:", "5S:", "ثبت آیدلر", "ارتعاش‌سنجی"],
+      "G7-220A": ["درام تیل:", "شوت ورودی:", "نوار:", "غلطک ها:", "درام بندینگ تیل:", "درام بندینگ هd:", "درام تنشن:", "کانترویت:", "شوت خروجی:","درام اسنپ هد:", "درام هد:", "موتور:", "کوپلینگ موتور:", "گیربکس:", "5S:", "ثبت آیدلر", "ارتعاش‌سنجی"],
+      "G7-220B": ["درام تیل:", "شوت ورودی:", "نوار:", "غلطک ها:", "درام بندینگ تیل:", "درام بندینگ هd:", "درام تنشن:", "کانترویت:", "شوت خروجی:","درام اسنپ هد:", "درام هd:", "موتور:", "کوپلینگ موتور:", "گیربکس:", "5S:", "ثبت آیدلر", "ارتعاش‌سنجی"],
     };
 
     const checklistItems = {
@@ -574,7 +647,7 @@
       "موتور:": ["دما", "ارتعاش", "صدا", "اتصال به شاسی", "نظافت"],
       "کوپلینگ موتور:": ["صدا", "دما", "روانکاری", "وضعیت حفاظ"],
       "گیربکس:": ["دما", "ارتعاش", "صدا", "وضعیت اتصال", "سطح و نشت روغن", "ایربرسر", "شیرینگ دیسک", "وضعیت کوپلینگ به  درام"],
-      "5S:": ["نظافت محیط", "ضایعات", "موارد برق و ابزار دقیق", "موارد ایمنی"],
+      "5S:": ["نظافت محیط", "ض  یعات", "موارد برق و ابزار دقیق", "موارد ایمنی"],
       "ثبت آیدلر": [], // برای بخش ثبت آیدلر
       "ارتعاش‌سنجی": [] // برای بخش ارتعاش‌سنجی
     };
@@ -585,6 +658,9 @@
     let currentLocation = null;
     let geolocationWatchId = null;
     let gpsAccessGranted = false;
+    let isFileLoaded = false; // آیا فایل قبلی بارگذاری شده؟
+    let originalFileData = null; // داده‌های اصلی فایل بارگذاری شده
+    let editedItemsCount = 0; // تعداد آیتم‌های ویرایش شده
 
     // ===== المان‌های برنامه اصلی =====
     const elId = document.getElementById('personnelId');
@@ -607,6 +683,15 @@
     const restoreNewBtn = document.getElementById('restoreNewBtn');
     const locationStatus = document.getElementById('locationStatus');
     const gpsWarning = document.getElementById('gpsWarning');
+    const importBtn = document.getElementById('importBtn');
+    const fileInput = document.getElementById('fileInput');
+    
+    // المان‌های جدید برای درصد پیشرفت
+    const progressDisplay = document.getElementById('progressDisplay');
+    const progressPercentage = document.getElementById('progressPercentage');
+    const progressCompleted = document.getElementById('progressCompleted');
+    const progressTotal = document.getElementById('progressTotal');
+    const progressFill = document.getElementById('progressFill');
 
     // ===== المان‌های برنامه آیدلر =====
     const mainApp = document.getElementById('mainApp');
@@ -633,6 +718,11 @@
       const d = new Date(); 
       return d.toLocaleDateString('fa-IR') + ' ' + d.toLocaleTimeString('fa-IR'); 
     }
+
+    function getCurrentDateOnly() {
+      const d = new Date();
+      return d.toLocaleDateString('fa-IR').split(' ')[0]; // فقط تاریخ
+    }
     
     function ensureArrayLen(len) { 
       allComponentsData = Array(len).fill(null); 
@@ -643,52 +733,258 @@
         ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); 
     }
 
-    // ===== توابع بخش ارتعاش‌سنجی =====
+    // ===== توابع جدید برای درصد پیشرفت (ویرایش شده) =====
+    
+    // تابع برای محاسبه تعداد کل آیتم‌های بازرسی یک تجهیز
+    function calculateTotalItems(equipment) {
+        let total = 0;
+        const components = equipmentData[equipment] || [];
+        
+        components.forEach(component => {
+            if (component === "ثبت آیدلر") {
+                // برای بخش آیدلر، تعداد آیدلرهای ثبت شده را می‌شماریم
+                const idlers = JSON.parse(localStorage.getItem('idlers') || '[]');
+                const equipmentIdlers = idlers.filter(idler => idler.equipment === equipment);
+                total += equipmentIdlers.length;
+            } else if (component === "ارتعاش‌سنجی") {
+                // برای بخش ارتعاش، بررسی می‌کنیم آیا نیاز به ارتعاش‌سنجی هست
+                const componentIndex = components.indexOf(component);
+                const componentData = allComponentsData[componentIndex];
+                
+                if (componentData && componentData.vibrationData) {
+                    const vibrationData = componentData.vibrationData;
+                    // بررسی اینکه آیا حداقل یک باکس پر شده است
+                    let hasData = false;
+                    
+                    // بررسی موتور
+                    if (vibrationData.motor) {
+                        const motorFields = ['horizontal1', 'vertical1', 'axial1', 'horizontal2', 'vertical2', 'axial2', 'temperature'];
+                        hasData = motorFields.some(field => vibrationData.motor[field] && vibrationData.motor[field].trim() !== '');
+                    }
+                    
+                    // بررسی گیربکس
+                    if (!hasData && vibrationData.gearbox) {
+                        const gearboxFields = ['horizontal1', 'vertical1', 'axial1', 'horizontal2', 'vertical2', 'axial2', 'temperature'];
+                        hasData = gearboxFields.some(field => vibrationData.gearbox[field] && vibrationData.gearbox[field].trim() !== '');
+                    }
+                    
+                    if (hasData) {
+                        total += 14; // 14 باکس ارتعاش‌سنجی
+                    }
+                    // اگر هیچ داده‌ای نیست، ارتعاش‌سنجی لازم نیست و شمرده نمی‌شود
+                }
+            } else {
+                // برای سایر اجزا، آیتم‌های چک‌لیست را می‌شماریم
+                const items = checklistItems[component] || [];
+                total += items.length;
+            }
+        });
+        
+        return total;
+    }
+
+    // تابع برای محاسبه تعداد آیتم‌های تکمیل شده
+    function calculateCompletedItems(equipment, componentsData) {
+        let completed = 0;
+        const components = equipmentData[equipment] || [];
+        
+        components.forEach((component, index) => {
+            if (component === "ثبت آیدلر") {
+                // برای بخش آیدلر، تعداد آیدلرهای ثبت شده را می‌شماریم
+                const idlers = JSON.parse(localStorage.getItem('idlers') || '[]');
+                const equipmentIdlers = idlers.filter(idler => idler.equipment === equipment);
+                completed += equipmentIdlers.length;
+            } else if (component === "ارتعاش‌سنجی") {
+                // برای بخش ارتعاش، هر باکس پر شده یک آیتم تکمیل شده است
+                const componentData = componentsData[index];
+                if (componentData && componentData.vibrationData) {
+                    const vibrationData = componentData.vibrationData;
+                    
+                    // شمارش باکس‌های پر شده موتور
+                    if (vibrationData.motor) {
+                        const motorFields = ['horizontal1', 'vertical1', 'axial1', 'horizontal2', 'vertical2', 'axial2', 'temperature'];
+                        motorFields.forEach(field => {
+                            if (vibrationData.motor[field] && vibrationData.motor[field].trim() !== '') {
+                                completed++;
+                            }
+                        });
+                    }
+                    
+                    // شمارش باکس‌های پر شده گیربکس
+                    if (vibrationData.gearbox) {
+                        const gearboxFields = ['horizontal1', 'vertical1', 'axial1', 'horizontal2', 'vertical2', 'axial2', 'temperature'];
+                        gearboxFields.forEach(field => {
+                            if (vibrationData.gearbox[field] && vibrationData.gearbox[field].trim() !== '') {
+                                completed++;
+                            }
+                        });
+                    }
+                }
+            } else {
+                // برای سایر اجزا، آیتم‌های با وضعیت OK یا NotOK را می‌شماریم
+                const componentData = componentsData[index];
+                if (componentData && componentData.checklist) {
+                    componentData.checklist.forEach(item => {
+                        if (item.status === 'ok' || item.status === 'notok' || item.status === 'bulk-ok') {
+                            completed++;
+                        }
+                    });
+                }
+            }
+        });
+        
+        return completed;
+    }
+
+    // تابع برای به‌روزرسانی نمایش درصد پیشرفت
+    function updateProgressDisplay() {
+        if (!currentEquipment) return;
+        
+        const totalItems = calculateTotalItems(currentEquipment);
+        const completedItems = calculateCompletedItems(currentEquipment, allComponentsData);
+        
+        let percentage = 0;
+        if (totalItems > 0) {
+            percentage = Math.round((completedItems / totalItems) * 100);
+        }
+        
+        // به‌روزرسانی المان‌ها
+        progressPercentage.textContent = percentage;
+        progressCompleted.textContent = completedItems;
+        progressTotal.textContent = totalItems;
+        progressFill.style.width = percentage + '%';
+        
+        // نمایش المان درصد پیشرفت
+        progressDisplay.style.display = 'block';
+    }
+
+    // ===== توابع جدید برای لغو محدودیت GPS =====
+    
+    // تابع بررسی آیا کاربر مجاز به عبور از محدودیت GPS است
+    function isUserExemptFromGPS() {
+        const pid = toEnglishDigits(elId.value.trim());
+        return pid === '14126';
+    }
+
+    // اصلاح توابع مربوط به GPS برای کاربر معاف
+    function modifyGPSFunctions() {
+        // ذخیره توابع اصلی
+        const originalGetLocation = getLocation;
+        const originalStartGeolocationMonitoring = startGeolocationMonitoring;
+        const originalCheckGeolocationPermission = checkGeolocationPermission;
+        
+        // بازنویسی توابع با در نظر گرفتن کاربر معاف
+        getLocation = function() {
+            if (isUserExemptFromGPS()) {
+                // برای کاربر معاف، موقعیت ساختگی تنظیم می‌کنیم
+                currentLocation = {
+                    latitude: 0,
+                    longitude: 0,
+                    accuracy: 0,
+                    timestamp: new Date().toISOString(),
+                    exempt: true
+                };
+                locationStatus.textContent = "موقعیت‌یابی: معاف (کاربر ویژه)";
+                enableFormActions();
+                return Promise.resolve(true);
+            }
+            return originalGetLocation();
+        };
+        
+        startGeolocationMonitoring = function() {
+            if (isUserExemptFromGPS()) {
+                // برای کاربر معاف، مانیتورینگ موقعیت غیرفعال است
+                locationStatus.textContent = "موقعیت‌یابی: معاف (کاربر ویژه)";
+                enableFormActions();
+                return;
+            }
+            originalStartGeolocationMonitoring();
+        };
+        
+        checkGeolocationPermission = function() {
+            if (isUserExemptFromGPS()) {
+                return Promise.resolve(true);
+            }
+            return originalCheckGeolocationPermission();
+        };
+    }
+
+    // ===== توابع بخش ارتعاش‌سنجی (ویرایش شده با 14 باکس) =====
     function createVibrationSection() {
       return `
         <div class="vibration-section">
           <!-- بخش موتور -->
           <div class="vibration-part">
-            <div class="part-title">موتور</div>
+            <div class="part-title">موتور - نقطه 1</div>
             <div class="position-labels">
               <div class="position-label">افقی</div>
               <div class="position-label">عمودی</div>
               <div class="position-label">محوری</div>
             </div>
             <div class="position-inputs">
-              <input type="number" class="vibration-input" id="motor_horizontal" placeholder="---" step="0.01" min="0">
-              <input type="number" class="vibration-input" id="motor_vertical" placeholder="---" step="0.01" min="0">
-              <input type="number" class="vibration-input" id="motor_axial" placeholder="---" step="0.01" min="0">
+              <input type="number" class="vibration-input motor-input" id="motor_horizontal1" placeholder="---" step="0.01" min="0">
+              <input type="number" class="vibration-input motor-input" id="motor_vertical1" placeholder="---" step="0.01" min="0">
+              <input type="number" class="vibration-input motor-input" id="motor_axial1" placeholder="---" step="0.01" min="0">
             </div>
+            
+            <div class="part-title" style="margin-top: 15px;">موتور - نقطه 2</div>
+            <div class="position-labels">
+              <div class="position-label">افقی</div>
+              <div class="position-label">عمودی</div>
+              <div class="position-label">محوری</div>
+            </div>
+            <div class="position-inputs">
+              <input type="number" class="vibration-input motor-input" id="motor_horizontal2" placeholder="---" step="0.01" min="0">
+              <input type="number" class="vibration-input motor-input" id="motor_vertical2" placeholder="---" step="0.01" min="0">
+              <input type="number" class="vibration-input motor-input" id="motor_axial2" placeholder="---" step="0.01" min="0">
+            </div>
+            
             <div class="unit">mm/s</div>
             
             <div class="temp-section">
               <label>🌡️ دمای موتور:</label>
-              <input type="number" class="temp-input" id="motor_temp" placeholder="---" step="0.1" min="0">
+              <input type="number" class="temp-input motor-input" id="motor_temp" placeholder="---" step="0.1" min="0">
               <span class="unit">°C</span>
             </div>
           </div>
           
           <!-- بخش گیربکس -->
           <div class="vibration-part">
-            <div class="part-title">گیربکس</div>
+            <div class="part-title">گیربکس - نقطه 1</div>
             <div class="position-labels">
               <div class="position-label">افقی</div>
               <div class="position-label">عمودی</div>
               <div class="position-label">محوری</div>
             </div>
             <div class="position-inputs">
-              <input type="number" class="vibration-input" id="gearbox_horizontal" placeholder="---" step="0.01" min="0">
-              <input type="number" class="vibration-input" id="gearbox_vertical" placeholder="---" step="0.01" min="0">
-              <input type="number" class="vibration-input" id="gearbox_axial" placeholder="---" step="0.01" min="0">
+              <input type="number" class="vibration-input gearbox-input" id="gearbox_horizontal1" placeholder="---" step="0.01" min="0">
+              <input type="number" class="vibration-input gearbox-input" id="gearbox_vertical1" placeholder="---" step="0.01" min="0">
+              <input type="number" class="vibration-input gearbox-input" id="gearbox_axial1" placeholder="---" step="0.01" min="0">
             </div>
+            
+            <div class="part-title" style="margin-top: 15px;">گیربکس - نقطه 2</div>
+            <div class="position-labels">
+              <div class="position-label">افقی</div>
+              <div class="position-label">عمودی</div>
+              <div class="position-label">محوری</div>
+            </div>
+            <div class="position-inputs">
+              <input type="number" class="vibration-input gearbox-input" id="gearbox_horizontal2" placeholder="---" step="0.01" min="0">
+              <input type="number" class="vibration-input gearbox-input" id="gearbox_vertical2" placeholder="---" step="0.01" min="0">
+              <input type="number" class="vibration-input gearbox-input" id="gearbox_axial2" placeholder="---" step="0.01" min="0">
+            </div>
+            
             <div class="unit">mm/s</div>
             
             <div class="temp-section">
               <label>🌡️ دمای گیربکس:</label>
-              <input type="number" class="temp-input" id="gearbox_temp" placeholder="---" step="0.1" min="0">
+              <input type="number" class="temp-input gearbox-input" id="gearbox_temp" placeholder="---" step="0.1" min="0">
               <span class="unit">°C</span>
             </div>
+          </div>
+          
+          <div style="text-align: center; font-size: 12px; color: #666; margin-top: 10px;">
+            توجه: در صورت عدم نیاز به ارتعاش‌سنجی، فیلدها را خالی رها کنید
           </div>
         </div>
       `;
@@ -702,17 +998,23 @@
         
         // بارگذاری داده‌های موتور
         if (data.motor) {
-          document.getElementById('motor_horizontal').value = data.motor.horizontal || '';
-          document.getElementById('motor_vertical').value = data.motor.vertical || '';
-          document.getElementById('motor_axial').value = data.motor.axial || '';
+          document.getElementById('motor_horizontal1').value = data.motor.horizontal1 || '';
+          document.getElementById('motor_vertical1').value = data.motor.vertical1 || '';
+          document.getElementById('motor_axial1').value = data.motor.axial1 || '';
+          document.getElementById('motor_horizontal2').value = data.motor.horizontal2 || '';
+          document.getElementById('motor_vertical2').value = data.motor.vertical2 || '';
+          document.getElementById('motor_axial2').value = data.motor.axial2 || '';
           document.getElementById('motor_temp').value = data.motor.temperature || '';
         }
         
         // بارگذاری داده‌های گیربکس
         if (data.gearbox) {
-          document.getElementById('gearbox_horizontal').value = data.gearbox.horizontal || '';
-          document.getElementById('gearbox_vertical').value = data.gearbox.vertical || '';
-          document.getElementById('gearbox_axial').value = data.gearbox.axial || '';
+          document.getElementById('gearbox_horizontal1').value = data.gearbox.horizontal1 || '';
+          document.getElementById('gearbox_vertical1').value = data.gearbox.vertical1 || '';
+          document.getElementById('gearbox_axial1').value = data.gearbox.axial1 || '';
+          document.getElementById('gearbox_horizontal2').value = data.gearbox.horizontal2 || '';
+          document.getElementById('gearbox_vertical2').value = data.gearbox.vertical2 || '';
+          document.getElementById('gearbox_axial2').value = data.gearbox.axial2 || '';
           document.getElementById('gearbox_temp').value = data.gearbox.temperature || '';
         }
       }
@@ -721,16 +1023,22 @@
     function saveVibrationData() {
       const vibrationData = {
         motor: {
-          horizontal: document.getElementById('motor_horizontal').value || null,
-          vertical: document.getElementById('motor_vertical').value || null,
-          axial: document.getElementById('motor_axial').value || null,
-          temperature: document.getElementById('motor_temp').value || null
+          horizontal1: document.getElementById('motor_horizontal1').value || '',
+          vertical1: document.getElementById('motor_vertical1').value || '',
+          axial1: document.getElementById('motor_axial1').value || '',
+          horizontal2: document.getElementById('motor_horizontal2').value || '',
+          vertical2: document.getElementById('motor_vertical2').value || '',
+          axial2: document.getElementById('motor_axial2').value || '',
+          temperature: document.getElementById('motor_temp').value || ''
         },
         gearbox: {
-          horizontal: document.getElementById('gearbox_horizontal').value || null,
-          vertical: document.getElementById('gearbox_vertical').value || null,
-          axial: document.getElementById('gearbox_axial').value || null,
-          temperature: document.getElementById('gearbox_temp').value || null
+          horizontal1: document.getElementById('gearbox_horizontal1').value || '',
+          vertical1: document.getElementById('gearbox_vertical1').value || '',
+          axial1: document.getElementById('gearbox_axial1').value || '',
+          horizontal2: document.getElementById('gearbox_horizontal2').value || '',
+          vertical2: document.getElementById('gearbox_vertical2').value || '',
+          axial2: document.getElementById('gearbox_axial2').value || '',
+          temperature: document.getElementById('gearbox_temp').value || ''
         },
         unit: "mm/s",
         timestamp: new Date().toISOString()
@@ -797,6 +1105,9 @@
         equipment: currentEquipment // ذخیره نام تجهیز
       });
       localStorage.setItem('idlers', JSON.stringify(idlers));
+      
+      // به‌روزرسانی درصد پیشرفت پس از ذخیره آیدلر
+      updateProgressDisplay();
     }
 
     function resetIdlerFormKeepTypeFocus() {
@@ -1155,7 +1466,7 @@
             let errorMessage = "موقعیت‌یابی: ناموفق - ";
             switch(error.code) {
               case error.PERMISSION_DENIED:
-                errorMessage += "دسترسی رد شد. لطفا GPS را فعال کنید.";
+                errorMessage += "  سترسی رد شد. لطفا GPS را فعال کنید.";
                 break;
               case error.POSITION_UNAVAILABLE:
                 errorMessage += "اطلاعات موقعیت در دسترس نیست.";
@@ -1221,7 +1532,140 @@
       return null;
     }
 
-    // ===== توابع برنامه اصلی =====
+    // ===== توابع جدید برای چک‌باکس "انتخاب همه OK" =====
+    function createSelectAllCheckbox() {
+      return `
+        <div class="select-all-container">
+          <label class="select-all-checkbox">
+            <input type="checkbox" id="selectAllOkCheckbox">
+            <span>✅ انتخاب همه موارد به عنوان OK</span>
+          </label>
+          <div class="select-all-hint">
+            ابتدا موارد مشکل‌دار را علامت‌بزنید، سپس این گزینه را انتخاب کنید
+          </div>
+        </div>
+      `;
+    }
+
+    // ===== توابع جدید برای وارد کردن فایل JSON =====
+    function setupImportFileFunctionality() {
+      importBtn.addEventListener('click', () => {
+        fileInput.click();
+      });
+
+      fileInput.addEventListener('change', handleFileSelect);
+    }
+
+    function handleFileSelect(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const fileData = JSON.parse(e.target.result);
+          validateAndLoadFile(fileData);
+        } catch (error) {
+          alert('خطا در خواندن فایل JSON. لطفاً فایل معتبر انتخاب کنید.');
+          console.error('Error parsing JSON:', error);
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function validateAndLoadFile(fileData) {
+      // قانون ۱: بررسی شماره پرسنلی
+      const currentPid = toEnglishDigits(elId.value.trim());
+      const filePid = toEnglishDigits(fileData.personnelId);
+      
+      if (currentPid !== filePid) {
+        alert(`شماره پرسنلی فایل (${fileData.personnelId}) با کاربر فعلی (${elId.value}) مطابقت ندارد.`);
+        return;
+      }
+
+      // قانون ۲: بررسی تاریخ ثبت اولیه
+      const today = getCurrentDateOnly();
+      const fileDate = fileData.originalDate || fileData.savedAt?.split(' ')[0];
+      
+      if (fileDate !== today) {
+        alert(`فایل مربوط به تاریخ ${fileDate} است (امروز: ${today}). فقط فایل‌های امروز قابل ویرایش هستند.`);
+        return;
+      }
+
+      // قانون ۳: بررسی تجهیز
+      if (fileData.equipment !== currentEquipment && currentEquipment !== "") {
+        const confirmLoad = confirm(
+          `تجهیز فایل (${fileData.equipment}) با تجهیز فعلی (${currentEquipment}) متفاوت است.\nآیا ادامه می‌دهید؟`
+        );
+        if (!confirmLoad) return;
+      }
+
+      // بارگذاری داده‌ها
+      loadFileData(fileData);
+    }
+
+    function loadFileData(fileData) {
+      // ذخیره داده‌های اصلی برای ردیابی ویرایش
+      originalFileData = JSON.parse(JSON.stringify(fileData));
+      isFileLoaded = true;
+      editedItemsCount = 0;
+
+      // بارگذاری اطلاعات پرسنلی (فقط نمایشی)
+      elId.value = fileData.personnelId;
+      elName.textContent = fileData.personnelName || operators[toEnglishDigits(fileData.personnelId)] || '---';
+
+      // بارگذاری تجهیز
+      if (fileData.equipment && !currentEquipment) {
+        currentEquipment = fileData.equipment;
+        selEquip.value = currentEquipment;
+        currentComponents = equipmentData[currentEquipment] || [];
+        
+        if (!currentComponents.length) {
+          alert('برای این تجهیز جزء تعریف نشده است');
+          return;
+        }
+
+        ensureArrayLen(currentComponents.length);
+        itemMeta = {};
+        fillComponentsDropdownPage2();
+        
+        // شروع نظارت موقعیت‌یابی
+        startGeolocationMonitoring();
+        
+        // نمایش صفحه دوم
+        page1.style.display = 'none';
+        page2.style.display = 'block';
+      }
+
+      // بارگذاری داده‌های اجزا
+      if (fileData.components && Array.isArray(fileData.components)) {
+        fileData.components.forEach((componentData, index) => {
+          if (index < allComponentsData.length) {
+            allComponentsData[index] = componentData;
+            
+            // علامت‌گذاری آیتم‌ها به عنوان "غیر ویرایش شده"
+            if (componentData.checklist) {
+              componentData.checklist.forEach(item => {
+                item.wasEdited = false;
+                item.originalTimestamp = item.timestamp;
+              });
+            }
+          }
+        });
+      }
+
+      // بارگذاری آیدلرها
+      if (fileData.idlers && Array.isArray(fileData.idlers)) {
+        localStorage.setItem('idlers', JSON.stringify(fileData.idlers));
+      }
+
+      // بارگذاری اولیه جزء فعلی
+      loadComponent(0);
+
+      alert('فایل با موفقیت بارگذاری شد. اکنون می‌توانید ویرایش‌های مورد نیاز را اعمال کنید.');
+    }
+
+    // ===== توابع اصلی برنامه (ویرایش شده با قابلیت‌های جدید) =====
     (function fillEquip() {
       selEquip.innerHTML = '';
       Object.keys(equipmentData).forEach(k => {
@@ -1304,128 +1748,305 @@
       };
     }
 
-    function loadComponent(index) {
-      if (index < 0 || index >= currentComponents.length) return;
-      
-      const compName = currentComponents[index];
-      
-      // اگر جزء انتخاب شده "ثبت آیدلر" باشد
-      if (compName === "ثبت آیدلر") {
-        showIdlerApp();
-        return;
-      }
-      
-      currentIndex = index;
-      headerEquipment.textContent = currentEquipment;
-      headerComponent.textContent = currentComponents[index];
-      selCompPage2.value = String(index);
-      componentTitle.textContent = `${currentEquipment} — ${currentComponents[index]}`;
-      container.innerHTML = '';
-      
-      if (!itemMeta[compName]) itemMeta[compName] = {};
-      
-      // اگر جزء "ارتعاش‌سنجی" باشد
-      if (compName === "ارتعاش‌سنجی") {
-        container.innerHTML = createVibrationSection();
-        loadVibrationData(compName);
+    
+
+
+
+
+function loadComponent(index) {
+  if (index < 0 || index >= currentComponents.length) return;
+  
+  const compName = currentComponents[index];
+  
+  // اگر جزء انتخاب شده "ثبت آیدلر" باشد
+  if (compName === "ثبت آیدلر") {
+    showIdlerApp();
+    return;
+  }
+  
+  currentIndex = index;
+  headerEquipment.textContent = currentEquipment;
+  headerComponent.textContent = currentComponents[index];
+  selCompPage2.value = String(index);
+  componentTitle.textContent = `${currentEquipment} — ${currentComponents[index]}`;
+  container.innerHTML = '';
+  
+  if (!itemMeta[compName]) itemMeta[compName] = {};
+  
+  // اگر جزء "ارتعاش‌سنجی" باشد
+  if (compName === "ارتعاش‌سنجی") {
+    container.innerHTML = createVibrationSection();
+    loadVibrationData(compName);
+    
+    // اضافه کردن event listeners برای ذخیره‌سازی خودکار و ردیابی ویرایش
+    const inputs = container.querySelectorAll('.motor-input, .gearbox-input');
+    inputs.forEach(input => {
+      input.addEventListener('input', () => {
+        // علامت‌گذاری به عنوان ویرایش شده
+        const componentData = allComponentsData[currentIndex];
+        if (componentData) {
+          componentData.wasEdited = true;
+        }
         
-        // اضافه کردن event listeners برای ذخیره‌سازی خودکار
-        const inputs = container.querySelectorAll('input');
-        inputs.forEach(input => {
-          input.addEventListener('input', () => {
-            saveCurrentComponentData();
-            saveStateToLocalStorage();
-          });
-        });
+        saveCurrentComponentData();
+        saveStateToLocalStorage();
+        updateProgressDisplay();
+      });
+    });
+    
+  } else {
+    // کد برای سایر اجزا - ابتدا آیتم‌ها، سپس چک‌باکس
+    const items = checklistItems[compName] || [];
+    const saved = allComponentsData[index];
+
+    // ایجاد کانتینر اصلی برای آیتم‌ها
+    const itemsContainer = document.createElement('div');
+    itemsContainer.id = 'itemsContainer';
+    
+    // ایجاد آیتم‌ها
+    items.forEach((it, i) => {
+      const wrap = document.createElement('div'); 
+      wrap.className = 'check-item'; 
+      wrap.dataset.idx = String(i);
+      
+      wrap.innerHTML = `
+        <div style="font-size:17px;font-weight:800">${it}</div>
+        <div class="ci-opts">
+          <label for="ok_${index}_${i}" class="ok-opt">✅ Ok</label>
+          <label for="notok_${index}_${i}" class="notok-opt">❌ NotOk</label>
+        </div>
+        <input class="note" placeholder="توضیحات (اختیاری)">
+      `;
+      itemsContainer.appendChild(wrap);
+
+      const okLabel = wrap.querySelector('.ok-opt');
+      const notOkLabel = wrap.querySelector('.notok-opt');
+      const note = wrap.querySelector('.note');
+
+      let currentStatus = '';
+      let isBulkOk = false;
+      
+      if (saved && saved.checklist && saved.checklist[i]) {
+        const s = saved.checklist[i];
+        currentStatus = s.status || '';
+        if (s.note) note.value = s.note;
         
-      } else {
-        // کد قبلی برای سایر اجزا
-        const items = checklistItems[compName] || [];
-        const saved = allComponentsData[index];
-
-        items.forEach((it, i) => {
-          const wrap = document.createElement('div'); 
-          wrap.className = 'check-item'; 
-          wrap.dataset.idx = String(i);
-          
-          wrap.innerHTML = `
-            <div style="font-size:17px;font-weight:800">${it}</div>
-            <div class="ci-opts">
-              <label for="ok_${index}_${i}" class="ok-opt">✅ Ok</label>
-              <label for="notok_${index}_${i}" class="notok-opt">❌ NotOk</label>
-            </div>
-            <input class="note" placeholder="توضیحات (اختیاری)">
-          `;
-          container.appendChild(wrap);
-
-          const okLabel = wrap.querySelector('.ok-opt');
-          const notOkLabel = wrap.querySelector('.notok-opt');
-          const note = wrap.querySelector('.note');
-
-          let currentStatus = '';
-          if (saved && saved.checklist && saved.checklist[i]) {
-            const s = saved.checklist[i];
-            currentStatus = s.status || '';
-            if (s.note) note.value = s.note;
-            
-            if (currentStatus === 'ok') {
-              okLabel.classList.add('selected');
-            } else if (currentStatus === 'notok') {
-              notOkLabel.classList.add('selected');
-            }
-          }
-
-          function toggleSelection(selectedValue, selectedLabel, otherLabel) {
-            if (currentStatus === selectedValue) {
-              selectedLabel.classList.remove('selected');
-              currentStatus = '';
-            } else {
-              selectedLabel.classList.add('selected');
-              otherLabel.classList.remove('selected');
-              currentStatus = selectedValue;
-            }
-            
-            const timestamp = nowFa();
-            if (!itemMeta[compName]) itemMeta[compName] = {};
-            itemMeta[compName][it] = { 
-              status: currentStatus, 
-              timestamp: currentStatus ? timestamp : '', 
-              location: currentStatus ? currentLocation : null 
-            };
-            
-            saveCurrentComponentData();
-            saveStateToLocalStorage();
-          }
-
-          okLabel.addEventListener('click', () => {
-            toggleSelection('ok', okLabel, notOkLabel);
-          });
-
-          notOkLabel.addEventListener('click', () => {
-            toggleSelection('notok', notOkLabel, okLabel);
-          });
-          
-          note.addEventListener('input', () => {
-            saveCurrentComponentData();
-            saveStateToLocalStorage();
-          });
-        });
+        if (currentStatus === 'ok') {
+          okLabel.classList.add('selected');
+        } else if (currentStatus === 'notok') {
+          notOkLabel.classList.add('selected');
+        } else if (currentStatus === 'bulk-ok') {
+          okLabel.classList.add('selected');
+          okLabel.classList.add('bulk-ok');
+          isBulkOk = true;
+        }
       }
 
-      prevBtn.disabled = currentIndex === 0;
-      nextBtn.disabled = currentIndex === currentComponents.length - 1;
+      function toggleSelection(selectedValue, selectedLabel, otherLabel, isManual = true) {
+        // اگر چک‌باکس "همه OK" فعال است و کاربر سعی در تغییر دستی دارد
+        const selectAllCheckbox = document.getElementById('selectAllOkCheckbox');
+        if (selectAllCheckbox && selectAllCheckbox.checked && isManual) {
+          alert('برای تغییر دستی آیتم‌ها، ابتدا تیک "انتخاب همه موارد به عنوان OK" را بردارید.');
+          return;
+        }
 
-      setTimeout(() => {
-        try {
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-          document.documentElement.scrollTop = 0;
-          document.body.scrollTop = 0;
-          container.scrollTop = 0;
-          const first = container.querySelector('.check-item');
-          if (first) first.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        } catch(e) { console.warn(e); }
-      }, 60);
+        if (currentStatus === selectedValue && isManual) {
+          selectedLabel.classList.remove('selected');
+          selectedLabel.classList.remove('bulk-ok');
+          currentStatus = '';
+          isBulkOk = false;
+        } else {
+          // حذف کلاس bulk-ok اگر تغییر دستی است
+          if (isManual && isBulkOk) {
+            selectedLabel.classList.remove('bulk-ok');
+            isBulkOk = false;
+          }
+          
+          selectedLabel.classList.add('selected');
+          otherLabel.classList.remove('selected');
+          otherLabel.classList.remove('bulk-ok');
+          
+          if (!isManual) {
+            selectedLabel.classList.add('bulk-ok');
+            isBulkOk = true;
+            currentStatus = 'bulk-ok';
+          } else {
+            currentStatus = selectedValue;
+          }
+        }
+        
+        const timestamp = nowFa();
+        if (!itemMeta[compName]) itemMeta[compName] = {};
+        itemMeta[compName][it] = { 
+          status: currentStatus, 
+          timestamp: currentStatus ? timestamp : '', 
+          location: currentStatus ? currentLocation : null 
+        };
+        
+        // علامت‌گذاری به عنوان ویرایش شده
+        const componentData = allComponentsData[currentIndex];
+        if (componentData && componentData.checklist && componentData.checklist[i]) {
+          componentData.checklist[i].wasEdited = true;
+          if (isFileLoaded && !componentData.checklist[i].wasEdited) {
+            editedItemsCount++;
+          }
+        }
+        
+        saveCurrentComponentData();
+        saveStateToLocalStorage();
+        updateProgressDisplay();
+      }
+
+      okLabel.addEventListener('click', () => {
+        toggleSelection('ok', okLabel, notOkLabel, true);
+      });
+
+      notOkLabel.addEventListener('click', () => {
+        toggleSelection('notok', notOkLabel, okLabel, true);
+      });
+      
+      note.addEventListener('input', () => {
+        // علامت‌گذاری به عنوان ویرایش شده
+        const componentData = allComponentsData[currentIndex];
+        if (componentData && componentData.checklist && componentData.checklist[i]) {
+          componentData.checklist[i].wasEdited = true;
+          if (isFileLoaded && !componentData.checklist[i].wasEdited) {
+            editedItemsCount++;
+          }
+        }
+        
+        saveCurrentComponentData();
+        saveStateToLocalStorage();
+        updateProgressDisplay();
+      });
+    });
+    
+    // اضافه کردن آیتم‌ها به کانتینر اصلی
+    container.appendChild(itemsContainer);
+    
+    // ایجاد و اضافه کردن چک‌باکس "انتخاب همه OK" در انتها (فقط اگر آیتمی وجود داشته باشد)
+    if (items.length > 0) {
+      const selectAllContainer = document.createElement('div');
+      selectAllContainer.innerHTML = createSelectAllCheckbox();
+      container.appendChild(selectAllContainer);
+      
+      // تنظیم event listener برای چک‌باکس "انتخاب همه OK"
+      const selectAllCheckbox = document.getElementById('selectAllOkCheckbox');
+      if (selectAllCheckbox) {
+        selectAllCheckbox.addEventListener('change', function() {
+          const checkItems = container.querySelectorAll('.check-item');
+          
+          if (this.checked) {
+            // انتخاب همه موارد خالی به عنوان OK گروهی
+            checkItems.forEach((wrap, i) => {
+              const okLabel = wrap.querySelector('.ok-opt');
+              const notOkLabel = wrap.querySelector('.notok-opt');
+              
+              if (!okLabel.classList.contains('selected') && !notOkLabel.classList.contains('selected')) {
+                toggleSelectionForBulk('ok', okLabel, notOkLabel, i);
+              }
+            });
+          } else {
+            // حذف انتخاب‌های گروهی
+            checkItems.forEach((wrap, i) => {
+              const okLabel = wrap.querySelector('.ok-opt');
+              const notOkLabel = wrap.querySelector('.notok-opt');
+              
+              if (okLabel.classList.contains('bulk-ok')) {
+                okLabel.classList.remove('selected');
+                okLabel.classList.remove('bulk-ok');
+                
+                // به‌روزرسانی وضعیت در داده‌ها
+                const componentData = allComponentsData[currentIndex];
+                if (componentData && componentData.checklist && componentData.checklist[i]) {
+                  componentData.checklist[i].status = '';
+                  componentData.checklist[i].timestamp = '';
+                }
+              }
+            });
+            
+            saveCurrentComponentData();
+            saveStateToLocalStorage();
+            updateProgressDisplay();
+          }
+        });
+
+        // تابع کمکی برای تغییر وضعیت گروهی
+        function toggleSelectionForBulk(selectedValue, selectedLabel, otherLabel, index) {
+          selectedLabel.classList.add('selected');
+          selectedLabel.classList.add('bulk-ok');
+          otherLabel.classList.remove('selected');
+          otherLabel.classList.remove('bulk-ok');
+          
+          const timestamp = nowFa();
+          const itemTitle = items[index];
+          if (!itemMeta[compName]) itemMeta[compName] = {};
+          itemMeta[compName][itemTitle] = { 
+            status: 'bulk-ok', 
+            timestamp: timestamp, 
+            location: currentLocation 
+          };
+          
+          // علامت‌گذاری به عنوان ویرایش شده
+          const componentData = allComponentsData[currentIndex];
+          if (componentData && componentData.checklist && componentData.checklist[index]) {
+            componentData.checklist[index].wasEdited = true;
+            componentData.checklist[index].status = 'bulk-ok';
+            componentData.checklist[index].timestamp = timestamp;
+            
+            if (isFileLoaded && !componentData.checklist[index].wasEdited) {
+              editedItemsCount++;
+            }
+          }
+          
+          // ذخیره داده‌ها و به‌روزرسانی درصد پیشرفت
+          saveCurrentComponentData();
+          saveStateToLocalStorage();
+          updateProgressDisplay(); // این خط اصلاح شده
+        }
+      }
     }
+  }
+
+  prevBtn.disabled = currentIndex === 0;
+  nextBtn.disabled = currentIndex === currentComponents.length - 1;
+
+  // به‌روزرسانی درصد پیشرفت
+  updateProgressDisplay();
+
+  setTimeout(() => {
+    try {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+      container.scrollTop = 0;
+      const first = container.querySelector('.check-item');
+      if (first) first.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } catch(e) { console.warn(e); }
+  }, 60);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     function saveCurrentComponentData() {
       const compName = currentComponents[currentIndex];
@@ -1435,7 +2056,8 @@
         const vibrationData = saveVibrationData();
         allComponentsData[currentIndex] = { 
           component: compName, 
-          vibrationData: vibrationData 
+          vibrationData: vibrationData,
+          wasEdited: allComponentsData[currentIndex]?.wasEdited || false
         };
       } else {
         // کد قبلی برای سایر اجزا
@@ -1450,26 +2072,34 @@
           
           let status = '';
           if (okLabel.classList.contains('selected')) {
-            status = 'ok';
+            status = okLabel.classList.contains('bulk-ok') ? 'bulk-ok' : 'ok';
           } else if (notOkLabel.classList.contains('selected')) {
             status = 'notok';
           }
           
           const meta = (itemMeta[compName] && itemMeta[compName][title]) ? itemMeta[compName][title] : {};
+          const wasEdited = allComponentsData[currentIndex]?.checklist?.[i]?.wasEdited || false;
+          
           checklist.push({ 
             item: title, 
             status: status, 
             note, 
             timestamp: status ? (meta.timestamp || '') : '', 
-            location: status ? (meta.location ?? null) : null 
+            location: status ? (meta.location ?? null) : null,
+            wasEdited: wasEdited,
+            originalTimestamp: allComponentsData[currentIndex]?.checklist?.[i]?.originalTimestamp || meta.timestamp || ''
           });
         });
-        allComponentsData[currentIndex] = { component: compName, checklist };
+        allComponentsData[currentIndex] = { 
+          component: compName, 
+          checklist,
+          wasEdited: allComponentsData[currentIndex]?.wasEdited || false
+        };
       }
     }
 
     nextBtn.addEventListener('click', () => { 
-      if (!gpsAccessGranted) {
+      if (!gpsAccessGranted && !isUserExemptFromGPS()) {
         alert('برای ادامه کار، دسترسی به موقعیت‌یابی ضروری است.');
         getLocation();
         return;
@@ -1482,7 +2112,7 @@
     });
 
     prevBtn.addEventListener('click', () => { 
-      if (!gpsAccessGranted) {
+      if (!gpsAccessGranted && !isUserExemptFromGPS()) {
         alert('برای ادامه کار، دسترسی به موقعیت‌یابی ضروری است.');
         getLocation();
         return;
@@ -1495,8 +2125,8 @@
     });
 
     newFormBtn.addEventListener('click', async () => {
-      if (!gpsAccessGranted) {
-        alert('برای ذخیره فرم، دسترسی به موقعیت‌یابی ضروری است.');
+      if (!gpsAccessGranted && !isUserExemptFromGPS()) {
+        alert('برای ذخیره فرم، دسترسی به موقعیت‌یابی ض  وری است.');
         getLocation();
         return;
       }
@@ -1510,10 +2140,14 @@
         allComponentsData = [];
         itemMeta = {};
         currentLocation = null;
+        isFileLoaded = false;
+        originalFileData = null;
+        editedItemsCount = 0;
         page2.style.display = 'none';
         page1.style.display = 'block';
         
         clearStateFromLocalStorage();
+        localStorage.removeItem('idlers');
         
         if (geolocationWatchId) {
           navigator.geolocation.clearWatch(geolocationWatchId);
@@ -1525,7 +2159,7 @@
     });
 
     saveBtn.addEventListener('click', async () => {
-      if (!gpsAccessGranted) {
+      if (!gpsAccessGranted && !isUserExemptFromGPS()) {
         alert('برای ذخیره نهایی، دسترسی به موقعیت‌یابی ضروری است.');
         getLocation();
         return;
@@ -1542,6 +2176,9 @@
         allComponentsData = [];
         itemMeta = {};
         currentLocation = null;
+        isFileLoaded = false;
+        originalFileData = null;
+        editedItemsCount = 0;
         page2.style.display = 'none';
         page1.style.display = 'block';
         
@@ -1567,6 +2204,32 @@
       // دریافت داده‌های آیدلر از localStorage
       const idlersData = JSON.parse(localStorage.getItem('idlers') || '[]');
       
+      // شمارش آیتم‌های ویرایش شده
+      let editedCount = 0;
+      allComponentsData.forEach(component => {
+        if (component.checklist) {
+          component.checklist.forEach(item => {
+            if (item.wasEdited) editedCount++;
+          });
+        }
+        if (component.vibrationData && component.wasEdited) {
+          // برای ارتعاش‌سنجی، اگر داده‌ای ویرایش شده باشد
+          editedCount++;
+        }
+      });
+      
+      // ایجاد بخش verification برای فایل‌های ویرایش شده
+      let verificationSection = null;
+      if (isFileLoaded && editedCount > 0) {
+        verificationSection = {
+          originalDate: originalFileData?.originalDate || originalFileData?.savedAt?.split(' ')[0] || getCurrentDateOnly(),
+          editDate: getCurrentDateOnly(),
+          editTime: new Date().toLocaleTimeString('fa-IR'),
+          editedItemsCount: editedCount,
+          isEdited: true
+        };
+      }
+      
       const payload = { 
         personnelId: pid, 
         personnelName: pname, 
@@ -1574,16 +2237,17 @@
         savedAt: nowFa(), 
         location: currentLocation,
         components: allComponentsData,
-        idlers: idlersData  // اضافه کردن داده‌های آیدلر
+        idlers: idlersData,
+        verification: verificationSection
       };
       
       try {
         const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-        const fileNameWithoutExt = currentEquipment;
+        const fileNameWithoutExt = currentEquipment + (isFileLoaded ? '_ویرایش' : '');
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = fileNameWithoutExt;
+        a.download = fileNameWithoutExt + '.json';
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -1615,6 +2279,9 @@
       page1.style.display = 'none';
       page2.style.display = 'block';
       loadComponent(currentIndex);
+      
+      // به‌روزرسانی درصد پیشرفت پس از بازیابی
+      updateProgressDisplay();
     }
 
     function startNewForm() {
@@ -1628,12 +2295,21 @@
       allComponentsData = [];
       itemMeta = {};
       currentLocation = null;
+      isFileLoaded = false;
+      originalFileData = null;
+      editedItemsCount = 0;
       getLocation();
       restoreModal.style.display = 'none';
     }
 
     // ===== راه‌اندازی اولیه =====
     window.addEventListener('load', function() {
+      // اصلاح توابع GPS برای کاربر معاف
+      modifyGPSFunctions();
+      
+      // راه‌اندازی قابلیت وارد کردن فایل
+      setupImportFileFunctionality();
+      
       const savedState = checkForSavedState();
       if (savedState) {
         restoreModal.style.display = 'flex';
