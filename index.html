@@ -2122,148 +2122,164 @@ function loadComponent(index) {
       saveStateToLocalStorage();
       if (currentIndex > 0) loadComponent(currentIndex - 1); 
       else { window.scrollTo({ top: 0, behavior: 'smooth' }); } 
-    });
-
-    newFormBtn.addEventListener('click', async () => {
-      if (!gpsAccessGranted && !isUserExemptFromGPS()) {
-        alert('برای ذخیره فرم، دسترسی به موقعیت‌یابی ض  وری است.');
-        getLocation();
-        return;
-      }
-      
-      saveCurrentComponentData();
-      const ok = await doDownloadCurrentForm();
-      if (ok) {
-        currentEquipment = "";
-        currentComponents = [];
-        currentIndex = 0;
-        allComponentsData = [];
-        itemMeta = {};
-        currentLocation = null;
-        isFileLoaded = false;
-        originalFileData = null;
-        editedItemsCount = 0;
-        page2.style.display = 'none';
-        page1.style.display = 'block';
-        
-        clearStateFromLocalStorage();
-        localStorage.removeItem('idlers');
-        
-        if (geolocationWatchId) {
-          navigator.geolocation.clearWatch(geolocationWatchId);
-          geolocationWatchId = null;
-        }
-        
-        setTimeout(() => { window.scrollTo({ top: 0, behavior: 'smooth' }); }, 50);
-      }
-    });
+    });newFormBtn.addEventListener('click', async () => {
+  if (!gpsAccessGranted && !isUserExemptFromGPS()) {
+    alert('برای ذخیره فرم، دسترسی به موقعیت‌یابی ضروری است.');
+    getLocation();
+    return;
+  }
+  
+  // ذخیره داده‌های فعلی
+  saveCurrentComponentData();
+  
+  // بررسی آیا داده‌ای برای ذخیره وجود دارد
+  const hasData = allComponentsData.some(component => 
+    component && (
+      (component.checklist && component.checklist.some(item => item.status)) ||
+      (component.vibrationData && (
+        (component.vibrationData.motor && Object.values(component.vibrationData.motor).some(v => v)) ||
+        (component.vibrationData.gearbox && Object.values(component.vibrationData.gearbox).some(v => v))
+      ))
+    )
+  );
+  
+  const hasIdlers = JSON.parse(localStorage.getItem('idlers') || '[]').length > 0;
+  
+  if (!hasData && !hasIdlers) {
+    // هیچ داده‌ای برای ذخیره وجود ندارد
+    resetFormAndGoToPage1();
+    return;
+  }
+  
+  // درخواست تأیید از کاربر
+  const confirmSave = confirm('آیا می‌خواهید فرم فعلی را قبل از ایجاد فرم جدید ذخیره کنید؟');
+  
+  if (confirmSave) {
+    const ok = await doDownloadCurrentForm();
+    if (ok) {
+      alert('فایل ذخیره شد.');
+      resetFormAndGoToPage1();
+    } else {
+      alert('ذخیره فایل ناموفق بود.');
+    }
+  } else {
+    resetFormAndGoToPage1();
+  }
+});
 
     saveBtn.addEventListener('click', async () => {
-      if (!gpsAccessGranted && !isUserExemptFromGPS()) {
-        alert('برای ذخیره نهایی، دسترسی به موقعیت‌یابی ضروری است.');
-        getLocation();
-        return;
-      }
-      
-      saveCurrentComponentData();
-      const ok = await doDownloadCurrentForm();
-      if (ok) {
-        alert('فایل ذخیره شد (پوشه دانلود دستگاه).');
-        clearStateFromLocalStorage();
-        currentEquipment = "";
-        currentComponents = [];
-        currentIndex = 0;
-        allComponentsData = [];
-        itemMeta = {};
-        currentLocation = null;
-        isFileLoaded = false;
-        originalFileData = null;
-        editedItemsCount = 0;
-        page2.style.display = 'none';
-        page1.style.display = 'block';
-        
-        if (geolocationWatchId) {
-          navigator.geolocation.clearWatch(geolocationWatchId);
-          geolocationWatchId = null;
-        }
-      }
-    });
+  if (!gpsAccessGranted && !isUserExemptFromGPS()) {
+    alert('برای ذخیره نهایی، دسترسی به موقعیت‌یابی ضروری است.');
+    getLocation();
+    return;
+  }
+  
+  // ذخیره داده‌های فعلی
+  saveCurrentComponentData();
+  
+  // بررسی آیا داده‌ای برای ذخیره وجود دارد
+  const hasData = allComponentsData.some(component => 
+    component && (
+      (component.checklist && component.checklist.some(item => item.status)) ||
+      (component.vibrationData && (
+        (component.vibrationData.motor && Object.values(component.vibrationData.motor).some(v => v)) ||
+        (component.vibrationData.gearbox && Object.values(component.vibrationData.gearbox).some(v => v))
+      ))
+    )
+  );
+  
+  const hasIdlers = JSON.parse(localStorage.getItem('idlers') || '[]').length > 0;
+  
+  if (!hasData && !hasIdlers) {
+    alert('هیچ داده‌ای برای ذخیره وجود ندارد. لطفاً ابتدا فرم را تکمیل کنید.');
+    return;
+  }
+  
+  const ok = await doDownloadCurrentForm();
+  if (ok) {
+    alert('فایل ذخیره شد (پوشه دانلود دستگاه).');
+    resetFormAndGoToPage1();
+  } else {
+    alert('ذخیره فایل ناموفق بود.');
+  }
+});
 
-    async function doDownloadCurrentForm() {
-      const pid = toEnglishDigits(elId.value.trim());
-      const pname = elName.textContent || '---';
-      if (!pid || pname === '---') { 
-        alert('شماره پرسنلی معتبر وارد کنید'); 
-        return false; 
-      }
-      if (!currentEquipment) { 
-        alert('تجهیز انتخاب نشده'); 
-        return false; 
-      }
-      
-      // دریافت داده‌های آیدلر از localStorage
-      const idlersData = JSON.parse(localStorage.getItem('idlers') || '[]');
-      
-      // شمارش آیتم‌های ویرایش شده
-      let editedCount = 0;
-      allComponentsData.forEach(component => {
-        if (component.checklist) {
-          component.checklist.forEach(item => {
-            if (item.wasEdited) editedCount++;
-          });
-        }
-        if (component.vibrationData && component.wasEdited) {
-          // برای ارتعاش‌سنجی، اگر داده‌ای ویرایش شده باشد
-          editedCount++;
-        }
+async function doDownloadCurrentForm() {
+  const pid = toEnglishDigits(elId.value.trim());
+  const pname = elName.textContent || '---';
+  if (!pid || pname === '---') { 
+    alert('شماره پرسنلی معتبر وارد کنید'); 
+    return false; 
+  }
+  if (!currentEquipment) { 
+    alert('تجهیز انتخاب نشده'); 
+    return false; 
+  }
+  
+  // ذخیره داده‌های فعلی
+  saveCurrentComponentData();
+  
+  // دریافت داده‌های آیدلر از localStorage
+  const idlersData = JSON.parse(localStorage.getItem('idlers') || '[]');
+  
+  // شمارش آیتم‌های ویرایش شده
+  let editedCount = 0;
+  allComponentsData.forEach(component => {
+    if (component && component.checklist) {
+      component.checklist.forEach(item => {
+        if (item && item.wasEdited) editedCount++;
       });
-      
-      // ایجاد بخش verification برای فایل‌های ویرایش شده
-      let verificationSection = null;
-      if (isFileLoaded && editedCount > 0) {
-        verificationSection = {
-          originalDate: originalFileData?.originalDate || originalFileData?.savedAt?.split(' ')[0] || getCurrentDateOnly(),
-          editDate: getCurrentDateOnly(),
-          editTime: new Date().toLocaleTimeString('fa-IR'),
-          editedItemsCount: editedCount,
-          isEdited: true
-        };
-      }
-      
-      const payload = { 
-        personnelId: pid, 
-        personnelName: pname, 
-        equipment: currentEquipment, 
-        savedAt: nowFa(), 
-        location: currentLocation,
-        components: allComponentsData,
-        idlers: idlersData,
-        verification: verificationSection
-      };
-      
-      try {
-        const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-        const fileNameWithoutExt = currentEquipment + (isFileLoaded ? '_ویرایش' : '');
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = fileNameWithoutExt + '.json';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        
-        // پاک کردن داده‌های آیدلر پس از ذخیره موفق
-        localStorage.removeItem('idlers');
-        
-        return true;
-      } catch(err) {
-        console.error('خطا در ذخیره فایل:', err);
-        alert('خطا در ذخیره فایل رخ داد.');
-        return false;
-      }
     }
-
+    if (component && component.vibrationData && component.wasEdited) {
+      // برای ارتعاش‌سنجی، اگر داده‌ای ویرایش شده باشد
+      editedCount++;
+    }
+  });
+  
+  // ایجاد بخش verification برای فایل‌های ویرایش شده
+  let verificationSection = null;
+  if (isFileLoaded && editedCount > 0) {
+    verificationSection = {
+      originalDate: originalFileData?.originalDate || originalFileData?.savedAt?.split(' ')[0] || getCurrentDateOnly(),
+      editDate: getCurrentDateOnly(),
+      editTime: new Date().toLocaleTimeString('fa-IR'),
+      editedItemsCount: editedCount,
+      isEdited: true
+    };
+  }
+  
+  const payload = { 
+    personnelId: pid, 
+    personnelName: pname, 
+    equipment: currentEquipment, 
+    savedAt: nowFa(), 
+    location: currentLocation,
+    components: allComponentsData.filter(c => c !== null), // فیلتر کردن nullها
+    idlers: idlersData,
+    verification: verificationSection
+  };
+  
+  try {
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const fileNameWithoutExt = currentEquipment + (isFileLoaded ? '_ویرایش' : '');
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileNameWithoutExt + '.json';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 100);
+    
+    return true;
+  } catch(err) {
+    console.error('خطا در ذخیره فایل:', err);
+    alert('خطا در ذخیره فایل رخ داد: ' + err.message);
+    return false;
+  }
+}
     function restoreSavedState(state) {
       elId.value = state.personnelId;
       elName.textContent = operators[toEnglishDigits(state.personnelId)] || '---';
@@ -2363,6 +2379,56 @@ function loadComponent(index) {
         .then(() => console.log('Service Worker ثبت شد'))
         .catch(err => console.error('خطا در ثبت Service Worker:', err));
     }
+
+
+
+// ===== تابع جدید برای بازنشانی فرم و بازگشت به صفحه اول =====
+function resetFormAndGoToPage1() {
+  currentEquipment = "";
+  currentComponents = [];
+  currentIndex = 0;
+  allComponentsData = [];
+  itemMeta = {};
+  currentLocation = null;
+  isFileLoaded = false;
+  originalFileData = null;
+  editedItemsCount = 0;
+  
+  // بازنشانی فرم صفحه اول
+  elId.value = '';
+  elName.textContent = '---';
+  selEquip.selectedIndex = 0;
+  
+  // پاک کردن localStorage
+  clearStateFromLocalStorage();
+  localStorage.removeItem('idlers');
+  
+  // توقف نظارت موقعیت‌یابی
+  if (geolocationWatchId) {
+    navigator.geolocation.clearWatch(geolocationWatchId);
+    geolocationWatchId = null;
+  }
+  
+  // نمایش صفحه اول
+  page2.style.display = 'none';
+  page1.style.display = 'block';
+  
+  // شروع نظارت موقعیت‌یابی مجدد
+  setTimeout(() => {
+    getLocation();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, 50);
+}
+
+
+
+
+
+
+
+
+
+
   </script>
 </body>
 </html>
