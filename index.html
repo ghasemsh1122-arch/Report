@@ -2236,6 +2236,14 @@ async function doDownloadCurrentForm() {
     }
   });
   
+  // محاسبه درصد پیشرفت
+  const totalItems = calculateTotalItems(currentEquipment);
+  const completedItems = calculateCompletedItems(currentEquipment, allComponentsData);
+  let percent = 0;
+  if (totalItems > 0) {
+    percent = Math.round((completedItems / totalItems) * 100);
+  }
+  
   // ایجاد بخش verification برای فایل‌های ویرایش شده
   let verificationSection = null;
   if (isFileLoaded && editedCount > 0) {
@@ -2248,6 +2256,7 @@ async function doDownloadCurrentForm() {
     };
   }
   
+  // ساختار داده نهایی
   const payload = { 
     personnelId: pid, 
     personnelName: pname, 
@@ -2256,7 +2265,12 @@ async function doDownloadCurrentForm() {
     location: currentLocation,
     components: allComponentsData.filter(c => c !== null), // فیلتر کردن nullها
     idlers: idlersData,
-    verification: verificationSection
+    verification: verificationSection,
+    progress: { // اضافه کردن بخش درصد پیشرفت
+      percent: percent,
+      totalItems: totalItems,
+      completedItems: completedItems
+    }
   };
   
   try {
@@ -2279,8 +2293,7 @@ async function doDownloadCurrentForm() {
     alert('خطا در ذخیره فایل رخ داد: ' + err.message);
     return false;
   }
-}
-    function restoreSavedState(state) {
+}    function restoreSavedState(state) {
       elId.value = state.personnelId;
       elName.textContent = operators[toEnglishDigits(state.personnelId)] || '---';
       selEquip.value = state.equipment;
